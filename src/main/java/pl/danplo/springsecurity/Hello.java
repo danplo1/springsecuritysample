@@ -12,4 +12,8 @@ public class Hello {
        return "hello!";
 
     }
+    @GetMapping("/hello2")
+    public String sayHello2(){
+        return "hello2!";
+    }
 }

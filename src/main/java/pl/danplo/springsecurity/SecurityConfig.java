@@ -10,20 +10,29 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
+
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
-    public UserDetailsService userDetailsService(){
+    public UserDetailsService userDetailsService() {
 
-        UserDetails userDetails = User.withDefaultPasswordEncoder()
+        UserDetails user = User.withDefaultPasswordEncoder()
                 .username("user")
                 .password("user1")
                 .roles("USER")
                 .build();
-        return new InMemoryUserDetailsManager(userDetails);
+
+
+        UserDetails admin = User.withDefaultPasswordEncoder()
+                .username("admin")
+                .password("admin1")
+                .roles("ADMIN")
+                .build();
+        return new InMemoryUserDetailsManager(user, admin);
 
     }
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -31,6 +40,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/hello")//ta metoda bierze fragment urla i sprawdza czy odpowiednie uprawnienia zostały przypisane do tej usługi
                 .permitAll()
                 .anyRequest()//każde inne rządanie
-                .hasRole("admin");
+                .hasRole("ADMIN")
+                .and()
+                .formLogin()
+                .permitAll()
+                .and()
+                .logout().permitAll();
+
     }
 }
