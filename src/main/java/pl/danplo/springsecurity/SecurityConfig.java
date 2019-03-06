@@ -3,6 +3,7 @@ package pl.danplo.springsecurity;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
@@ -17,10 +18,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public UserDetailsService userDetailsService() {
 
-        UserDetails user = User.withDefaultPasswordEncoder()
+        UserDetails moderator = User.withDefaultPasswordEncoder()
                 .username("user")
                 .password("user1")
-                .roles("USER")
+                .roles("MODERATOR")
                 .build();
 
 
@@ -29,16 +30,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .password("admin1")
                 .roles("ADMIN")
                 .build();
-        return new InMemoryUserDetailsManager(user, admin);
-
+        return new InMemoryUserDetailsManager(moderator, admin);
     }
 
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/hello")//ta metoda bierze fragment urla i sprawdza czy odpowiednie uprawnienia zostały przypisane do tej usługi
+                .antMatchers(HttpMethod.GET, "/api")
                 .permitAll()
+                .antMatchers(HttpMethod.POST, "/api")
+                .hasRole("MODERATOR")
+                .antMatchers(HttpMethod.DELETE, "/api")
+                .hasRole("ADMIN")
                 .anyRequest()//każde inne rządanie
                 .hasRole("ADMIN")
                 .and()
