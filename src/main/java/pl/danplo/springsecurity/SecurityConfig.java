@@ -36,7 +36,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http.httpBasic().and()
+                .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/api")
                 .permitAll()
                 .antMatchers(HttpMethod.POST, "/api")
@@ -49,7 +50,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .permitAll()
                 .and()
-                .logout().permitAll();
+                .logout().permitAll()
+                .and()
+                .csrf().disable();
 
     }
 }
